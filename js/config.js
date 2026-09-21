@@ -1,8 +1,6 @@
-const SUPABASE_URL =
-    "https://snbqpbyccivqbjiougbv.supabase.co";
+const SUPABASE_URL = "https://eskumvmaljvrwiwqwiis.supabase.co";
 
-const SUPABASE_KEY =
-    "sb_publishable_Rk7KYM7CYX9M817efpPjeQ_9-4vDgTs";
+const SUPABASE_KEY = "sb_publishable_hL6OPFPftKb5UzCdvSTktA_28YoG6VW";
 
 function obtenerHeaders() {
 
@@ -45,5 +43,21 @@ async function obtenerEstudiantes() {
         );
     }
 }
+ obtenerEstudiantes();
+async function crearEstudiante(estudiante) {
 
-obtenerEstudiantes();
+    const respuesta = await fetch(
+        `${SUPABASE_URL}/rest/v1/estudiantes`,
+        {
+            method: "POST",
+            headers: obtenerHeaders(),
+            body: JSON.stringify(estudiante)
+        }
+    );
+
+    if (!respuesta.ok) {
+        throw new Error(
+            "No fue posible crear el estudiante"
+        );
+    }
+}
