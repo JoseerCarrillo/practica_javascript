@@ -44,7 +44,7 @@ function mostrarEstudiantes(estudiantes) {
     });
 }
 
-aasync function obtenerEstudiantes() {
+async function obtenerEstudiantes() {
     try {
         const respuesta = await fetch(`${SUPABASE_URL}/rest/v1/estudiantes?select=*`, {
             method: "GET",
@@ -76,4 +76,12 @@ async function crearEstudiante(estudiante) {
     }
 }
 
+const estudiante = {
+    nombre: document.querySelector("#nombre").value,
+    correo: document.querySelector("#correo").value,
+    programa: document.querySelector("#programa").value,
+    estado: "Activo"
+};
+
+crearEstudiante(estudiante);
 obtenerEstudiantes();
