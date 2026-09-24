@@ -76,39 +76,97 @@ async function crearEstudiante(estudiante) {
     }
 }
 
-const estudiante = {
-    nombre: document.querySelector("#nombre").value,
-    correo: document.querySelector("#correo").value,
-    programa: document.querySelector("#programa").value,
-    estado: "Activo"
-};
-
-async function eliminarEstudiante(id) {
-
-    const confirmar = confirm(
-        "¿Desea eliminar este estudiante?"
-    );
-
-    if (!confirmar) {
-        return;
-    }
+async function actualizarEstudiante(
+    id,
+    estudiante
+) {
 
     const respuesta = await fetch(
         `${SUPABASE_URL}/rest/v1/estudiantes?id=eq.${id}`,
         {
-            method: "DELETE",
-            headers: obtenerHeaders()
+            method: "PATCH",
+            headers: obtenerHeaders(),
+            body: JSON.stringify(estudiante)
         }
     );
 
     if (!respuesta.ok) {
         throw new Error(
-            "No fue posible eliminar"
+            "No fue posible actualizar"
         );
     }
 
     await obtenerEstudiantes();
 }
 
-crearEstudiante(estudiante);
+async function eliminarEstudiante(id) {
+    const confirmar = confirm("¿Desea eliminar este estudiante?");
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+        const respuesta = await fetch(`${SUPABASE_URL}/rest/v1/estudiantes?id=eq.${id}`, {
+            method: "DELETE",
+            headers: obtenerHeaders()
+        });
+
+        if (!respuesta.ok) {
+            throw new Error("No fue posible eliminar");
+        }
+
+        await obtenerEstudiantes();
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+async function editarEstudiante(id) {
+    try {
+        const respuesta = await fetch(`${SUPABASE_URL}/rest/v1/estudiantes?id=eq.${id}&select=*`, {
+            method: "GET",
+            headers: obtenerHeaders()
+        });
+
+        if (!respuesta.ok) {
+            throw new Error("No fue posible consultar el estudiante");
+        }
+
+        const resultado = await respuesta.json();
+        const estudiante = resultado[0];
+
+        document.querySelector("#nombre").value = estudiante.nombre;
+        document.querySelector("#correo").value = estudiante.correo;
+        document.querySelector("#programa").value = estudiante.programa;
+
+        estudianteEditando = id;
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+document.querySelector("#formEstudiante").addEventListener("submit", async function (evento) {
+    evento.preventDefault();
+
+    const estudiante = {
+        nombre: document.querySelector("#nombre").value,
+        correo: document.querySelector("#correo").value,
+        programa: document.querySelector("#programa").value,
+        estado: "Activo"
+    };
+
+    if (estudianteEditando === null) {
+        await crearEstudiante(estudiante);
+    } else {
+        await actualizarEstudiante(estudianteEditando, estudiante);
+        estudianteEditando = null;
+    }
+
+    await obtenerEstudiantes();
+    this.reset();
+});
+
 obtenerEstudiantes();
