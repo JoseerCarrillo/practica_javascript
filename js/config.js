@@ -83,5 +83,32 @@ const estudiante = {
     estado: "Activo"
 };
 
+async function eliminarEstudiante(id) {
+
+    const confirmar = confirm(
+        "¿Desea eliminar este estudiante?"
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    const respuesta = await fetch(
+        `${SUPABASE_URL}/rest/v1/estudiantes?id=eq.${id}`,
+        {
+            method: "DELETE",
+            headers: obtenerHeaders()
+        }
+    );
+
+    if (!respuesta.ok) {
+        throw new Error(
+            "No fue posible eliminar"
+        );
+    }
+
+    await obtenerEstudiantes();
+}
+
 crearEstudiante(estudiante);
 obtenerEstudiantes();
